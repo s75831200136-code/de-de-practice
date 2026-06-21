@@ -28,6 +28,9 @@
   }
   select.correct{ border-color:var(--green); background:#eafaf0; color:var(--green);}
   select.wrong{ border-color:var(--accent); background:#fdeceb; color:var(--accent);}
+  .expl{ display:none; margin:6px 0 2px; padding:8px 13px; font-size:14.5px; line-height:1.7;
+    color:#7a5b00; background:#fff7e6; border-left:3px solid #e0a800; border-radius:0 7px 7px 0;}
+  .expl b{ color:var(--accent);}
   .bar{position:sticky; top:0; z-index:5; background:#fff; padding:14px 18px; margin-bottom:14px;
     border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.1); display:flex; align-items:center;
     gap:12px; flex-wrap:wrap;}
@@ -55,7 +58,7 @@
 
   <div class="sheet">
     <h1>「得」和「的」互動練習</h1>
-    <div class="sub">在每個空格選出「得」或「的」，完成後按「對答案」　共 40 題（46 個空格）</div>
+    <div class="sub">在每個空格選出「得」或「的」，完成後按「對答案」　共 40 題（46 個空格）　答錯的題目會出現解說</div>
     <div id="quiz"></div>
     <div class="legend">
       <b>判斷口訣：</b>「<b>的</b>」放在名詞前（◯◯的＋名詞）；「<b>得</b>」放在動詞或形容詞後，接程度／結果（動詞＋得＋◯◯）。
@@ -64,51 +67,51 @@
 </div>
 
 <script>
-// 每題：文字以 _ 標示空格，answers 依序給正解
+// 每題：文字以 _ 標示空格，ans 依序給正解，expl 為答錯時顯示的解說
 const data = {
   "第一回　1 ～ 20": [
-    ["媽媽煮_菜很好吃。", ["的"]],
-    ["弟弟笑_很開心。", ["得"]],
-    ["這是我_新書包。", ["的"]],
-    ["小狗跑_好快。", ["得"]],
-    ["天空中_白雲很漂亮。", ["的"]],
-    ["我寫字寫_很慢。", ["得"]],
-    ["紅紅_蘋果掛在樹上。", ["的"]],
-    ["妹妹高興_跳起來。", ["得"]],
-    ["老師說_話我都記住了。", ["的"]],
-    ["今天雨下_好大。", ["得"]],
-    ["那件漂亮_衣服是姐姐_。", ["的","的"]],
-    ["哥哥吃_很飽。", ["得"]],
-    ["公園裡_花都開了。", ["的"]],
-    ["風吹_樹葉沙沙響。", ["得"]],
-    ["這是一隻可愛_小貓。", ["的"]],
-    ["姐姐唱歌唱_很好聽。", ["得"]],
-    ["藍藍_大海好寬廣。", ["的"]],
-    ["小朋友玩_很快樂。", ["得"]],
-    ["爺爺種_菜又大又甜。", ["的"]],
-    ["他長_很高，跑_也很快。", ["得","得"]]
+    ["媽媽煮_菜很好吃。", ["的"], "「煮<b>的</b>菜」：「的」後面接名詞「菜」，是「煮出來的東西」。"],
+    ["弟弟笑_很開心。", ["得"], "「笑<b>得</b>很開心」：「得」前面是動作「笑」，後面說明笑的程度。"],
+    ["這是我_新書包。", ["的"], "「我<b>的</b>新書包」：「的」後面接名詞，表示東西是「誰的」。"],
+    ["小狗跑_好快。", ["得"], "「跑<b>得</b>好快」：「得」前面是動作「跑」，後面說明跑得多快。"],
+    ["天空中_白雲很漂亮。", ["的"], "「天空中<b>的</b>白雲」：「的」後面接名詞「白雲」。"],
+    ["我寫字寫_很慢。", ["得"], "「寫<b>得</b>很慢」：「得」前面是動作「寫」，後面說明寫的程度。"],
+    ["紅紅_蘋果掛在樹上。", ["的"], "「紅紅<b>的</b>蘋果」：前面形容樣子，「的」後面接名詞「蘋果」。"],
+    ["妹妹高興_跳起來。", ["得"], "「高興<b>得</b>跳起來」：「得」前面是「高興」，後面說明高興到什麼結果。"],
+    ["老師說_話我都記住了。", ["的"], "「老師說<b>的</b>話」：「的」後面接名詞「話」。"],
+    ["今天雨下_好大。", ["得"], "「下<b>得</b>好大」：「得」前面是動作「下」，後面說明雨有多大。"],
+    ["那件漂亮_衣服是姐姐_。", ["的","的"], "兩個都用「<b>的</b>」：「漂亮的衣服」後接名詞；「是姐姐的」表示東西屬於誰。"],
+    ["哥哥吃_很飽。", ["得"], "「吃<b>得</b>很飽」：「得」前面是動作「吃」，後面說明吃的結果。"],
+    ["公園裡_花都開了。", ["的"], "「公園裡<b>的</b>花」：「的」後面接名詞「花」。"],
+    ["風吹_樹葉沙沙響。", ["得"], "「吹<b>得</b>……沙沙響」：「得」前面是動作「吹」，後面說明結果。"],
+    ["這是一隻可愛_小貓。", ["的"], "「可愛<b>的</b>小貓」：「的」後面接名詞「小貓」。"],
+    ["姐姐唱歌唱_很好聽。", ["得"], "「唱<b>得</b>很好聽」：「得」前面是動作「唱」，後面說明唱的程度。"],
+    ["藍藍_大海好寬廣。", ["的"], "「藍藍<b>的</b>大海」：「的」後面接名詞「大海」。"],
+    ["小朋友玩_很快樂。", ["得"], "「玩<b>得</b>很快樂」：「得」前面是動作「玩」，後面說明玩的程度。"],
+    ["爺爺種_菜又大又甜。", ["的"], "「爺爺種<b>的</b>菜」：「的」後面接名詞「菜」。"],
+    ["他長_很高，跑_也很快。", ["得","得"], "兩個都用「<b>得</b>」：長得很高、跑得很快，都是「動作／狀態＋得＋程度」。"]
   ],
   "第二回　21 ～ 40": [
-    ["姐姐畫_圖很美。", ["的"]],
-    ["小鳥飛_好高。", ["得"]],
-    ["這枝筆是哥哥_。", ["的"]],
-    ["弟弟急_滿頭大汗。", ["得"]],
-    ["圓圓_月亮升上來了。", ["的"]],
-    ["同學跑_比我快。", ["得"]],
-    ["媽媽買_水果很新鮮。", ["的"]],
-    ["小花笑_好甜。", ["得"]],
-    ["那是一本有趣_故事書。", ["的"]],
-    ["外面風吹_很冷。", ["得"]],
-    ["爸爸開_車很快，我坐_很穩。", ["的","得"]],
-    ["妹妹唱_很大聲。", ["得"]],
-    ["桌上_蛋糕被吃光了。", ["的"]],
-    ["天氣熱_讓人想喝水。", ["得"]],
-    ["白白_雪花飄下來。", ["的"]],
-    ["哥哥跳_很遠。", ["得"]],
-    ["奶奶說_故事很好聽。", ["的"]],
-    ["小狗叫_好大聲。", ["得"]],
-    ["這是老師送_禮物。", ["的"]],
-    ["他寫_字很工整，也寫_很快。", ["得","得"]]
+    ["姐姐畫_圖很美。", ["的"], "「姐姐畫<b>的</b>圖」：「的」後面接名詞「圖」。"],
+    ["小鳥飛_好高。", ["得"], "「飛<b>得</b>好高」：「得」前面是動作「飛」，後面說明飛多高。"],
+    ["這枝筆是哥哥_。", ["的"], "「是哥哥<b>的</b>」：表示這枝筆屬於哥哥。"],
+    ["弟弟急_滿頭大汗。", ["得"], "「急<b>得</b>滿頭大汗」：「得」前面是「急」，後面說明急到什麼結果。"],
+    ["圓圓_月亮升上來了。", ["的"], "「圓圓<b>的</b>月亮」：「的」後面接名詞「月亮」。"],
+    ["同學跑_比我快。", ["得"], "「跑<b>得</b>比我快」：「得」前面是動作「跑」，後面說明跑的程度。"],
+    ["媽媽買_水果很新鮮。", ["的"], "「媽媽買<b>的</b>水果」：「的」後面接名詞「水果」。"],
+    ["小花笑_好甜。", ["得"], "「笑<b>得</b>好甜」：「得」前面是動作「笑」，後面說明笑的樣子。"],
+    ["那是一本有趣_故事書。", ["的"], "「有趣<b>的</b>故事書」：「的」後面接名詞「故事書」。"],
+    ["外面風吹_很冷。", ["得"], "「吹<b>得</b>很冷」：「得」前面是動作「吹」，後面說明結果。"],
+    ["爸爸開_車很快，我坐_很穩。", ["的","得"], "前一格用「<b>的</b>」：開的車（後接名詞「車」）；後一格用「<b>得</b>」：坐得很穩（動作「坐」＋程度）。"],
+    ["妹妹唱_很大聲。", ["得"], "「唱<b>得</b>很大聲」：「得」前面是動作「唱」，後面說明程度。"],
+    ["桌上_蛋糕被吃光了。", ["的"], "「桌上<b>的</b>蛋糕」：「的」後面接名詞「蛋糕」。"],
+    ["天氣熱_讓人想喝水。", ["得"], "「熱<b>得</b>……」：「得」前面是形容詞「熱」，後面說明熱到什麼結果。"],
+    ["白白_雪花飄下來。", ["的"], "「白白<b>的</b>雪花」：「的」後面接名詞「雪花」。"],
+    ["哥哥跳_很遠。", ["得"], "「跳<b>得</b>很遠」：「得」前面是動作「跳」，後面說明跳多遠。"],
+    ["奶奶說_故事很好聽。", ["的"], "「奶奶說<b>的</b>故事」：「的」後面接名詞「故事」。"],
+    ["小狗叫_好大聲。", ["得"], "「叫<b>得</b>好大聲」：「得」前面是動作「叫」，後面說明叫的程度。"],
+    ["這是老師送_禮物。", ["的"], "「老師送<b>的</b>禮物」：「的」後面接名詞「禮物」。"],
+    ["他寫_字很工整，也寫_很快。", ["得","得"], "兩個都用「<b>得</b>」：寫得很工整、寫得很快，都是說明「寫」這個動作的程度。"]
   ]
 };
 
@@ -120,45 +123,47 @@ function render(){
     html += `<div class="sectit">${sec}</div><ol${n>0?' start="'+(n+1)+'"':''}>`;
     data[sec].forEach(item => {
       n++;
-      const [tpl, ans] = item;
+      const [tpl, ans, expl] = item;
       let ai = 0, line = '';
       for (const ch of tpl){
         if (ch === '_'){
           const a = ans[ai++];
           totalBlanks++;
-          line += `<select class="blank" data-ans="${a}"><option value="">？</option><option value="的">的</option><option value="得">得</option></select>`;
+          line += `<select class="blank" data-ans="${a}" data-q="${n}"><option value="">？</option><option value="的">的</option><option value="得">得</option></select>`;
         } else line += ch;
       }
-      html += `<li>${line}</li>`;
+      html += `<li>${line}<div class="expl" data-q="${n}">💡 ${expl}</div></li>`;
     });
     html += '</ol>';
   }
   quiz.innerHTML = html;
-  document.querySelector('.score b').nextSibling; // noop
-  document.getElementById('score').parentElement; // noop
 }
 render();
-document.querySelectorAll('.score').forEach(()=>{});
 document.querySelector('.bar .score').innerHTML = '得分：<b id="score">—</b> / ' + totalBlanks;
 
 function check(){
   const sels = document.querySelectorAll('select.blank');
   let correct = 0;
+  const wrongQ = new Set();
   sels.forEach(s => {
     s.classList.remove('correct','wrong');
     if (s.value === s.dataset.ans){ s.classList.add('correct'); correct++; }
-    else s.classList.add('wrong');
+    else { s.classList.add('wrong'); wrongQ.add(s.dataset.q); }
+  });
+  document.querySelectorAll('.expl').forEach(e => {
+    e.style.display = wrongQ.has(e.dataset.q) ? 'block' : 'none';
   });
   document.getElementById('score').textContent = correct;
   const pct = correct/sels.length;
   const g = document.getElementById('grade');
   if (pct === 1) g.textContent = '🎉 全對，太厲害了！';
-  else if (pct >= 0.8) g.textContent = '很棒，再檢查紅色的格子！';
-  else if (pct >= 0.6) g.textContent = '不錯，紅色的再想想～';
-  else g.textContent = '加油，看看下面的口訣再試一次！';
+  else if (pct >= 0.8) g.textContent = '很棒，看看紅色格子下面的解說！';
+  else if (pct >= 0.6) g.textContent = '不錯，紅色的看解說再想想～';
+  else g.textContent = '加油，照著下面的解說再試一次！';
 }
 function reset(){
   document.querySelectorAll('select.blank').forEach(s => { s.value=''; s.classList.remove('correct','wrong'); });
+  document.querySelectorAll('.expl').forEach(e => { e.style.display = 'none'; });
   document.getElementById('score').textContent = '—';
   document.getElementById('grade').textContent = '';
   window.scrollTo({top:0, behavior:'smooth'});
