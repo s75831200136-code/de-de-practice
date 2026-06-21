@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>「得」和「的」互動練習　40題</title>
+<style>
+  :root{
+    --ink:#222; --line:#b0b0b0; --accent:#c0392b; --green:#2e9e5b; --bg:#fff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+    color:var(--ink); background:#eef0f2; margin:0; padding:24px 16px; line-height:2;
+  }
+  .wrap{max-width:760px; margin:0 auto;}
+  .sheet{background:var(--bg); padding:30px 34px; border-radius:14px; box-shadow:0 4px 18px rgba(0,0,0,.08);}
+  h1{ text-align:center; font-size:25px; margin:0 0 2px; letter-spacing:1px;}
+  .sub{ text-align:center; color:#777; font-size:14px; margin-bottom:18px;}
+  .sectit{font-size:18px; font-weight:700; color:var(--accent); margin:22px 0 8px;
+    border-bottom:2px solid var(--accent); padding-bottom:4px;}
+  ol{padding-left:28px; margin:0;}
+  li{margin:9px 0; font-size:18px;}
+  select.blank{
+    font-family:inherit; font-size:17px; font-weight:700;
+    width:54px; text-align:center; padding:2px 4px; margin:0 2px;
+    border:1.6px solid var(--line); border-radius:6px; background:#fafafa; cursor:pointer;
+  }
+  select.correct{ border-color:var(--green); background:#eafaf0; color:var(--green);}
+  select.wrong{ border-color:var(--accent); background:#fdeceb; color:var(--accent);}
+  .bar{position:sticky; top:0; z-index:5; background:#fff; padding:14px 18px; margin-bottom:14px;
+    border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.1); display:flex; align-items:center;
+    gap:12px; flex-wrap:wrap;}
+  .bar .score{font-size:18px; font-weight:700;}
+  .bar .score b{color:var(--accent); font-size:22px;}
+  button{font-family:inherit; font-size:15px; padding:9px 18px; border:none; border-radius:8px;
+    cursor:pointer; font-weight:600;}
+  .primary{background:var(--accent); color:#fff;}
+  .ghost{background:#eee; color:#333;}
+  button:hover{opacity:.9;}
+  .legend{margin-top:24px; padding:14px 16px; background:#f6f7f9; border-left:4px solid var(--accent);
+    font-size:14px; color:#444; border-radius:0 8px 8px 0;}
+  .legend b{color:var(--accent);}
+  .grade{margin-left:auto; font-size:15px; color:#555;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <button class="primary" onclick="check()">對答案</button>
+    <button class="ghost" onclick="reset()">重做</button>
+    <span class="score">得分：<b id="score">—</b> / 46</span>
+    <span class="grade" id="grade"></span>
+  </div>
+
+  <div class="sheet">
+    <h1>「得」和「的」互動練習</h1>
+    <div class="sub">在每個空格選出「得」或「的」，完成後按「對答案」　共 40 題（46 個空格）</div>
+    <div id="quiz"></div>
+    <div class="legend">
+      <b>判斷口訣：</b>「<b>的</b>」放在名詞前（◯◯的＋名詞）；「<b>得</b>」放在動詞或形容詞後，接程度／結果（動詞＋得＋◯◯）。
+    </div>
+  </div>
+</div>
+
+<script>
+// 每題：文字以 _ 標示空格，answers 依序給正解
+const data = {
+  "第一回　1 ～ 20": [
+    ["媽媽煮_菜很好吃。", ["的"]],
+    ["弟弟笑_很開心。", ["得"]],
+    ["這是我_新書包。", ["的"]],
+    ["小狗跑_好快。", ["得"]],
+    ["天空中_白雲很漂亮。", ["的"]],
+    ["我寫字寫_很慢。", ["得"]],
+    ["紅紅_蘋果掛在樹上。", ["的"]],
+    ["妹妹高興_跳起來。", ["得"]],
+    ["老師說_話我都記住了。", ["的"]],
+    ["今天雨下_好大。", ["得"]],
+    ["那件漂亮_衣服是姐姐_。", ["的","的"]],
+    ["哥哥吃_很飽。", ["得"]],
+    ["公園裡_花都開了。", ["的"]],
+    ["風吹_樹葉沙沙響。", ["得"]],
+    ["這是一隻可愛_小貓。", ["的"]],
+    ["姐姐唱歌唱_很好聽。", ["得"]],
+    ["藍藍_大海好寬廣。", ["的"]],
+    ["小朋友玩_很快樂。", ["得"]],
+    ["爺爺種_菜又大又甜。", ["的"]],
+    ["他長_很高，跑_也很快。", ["得","得"]]
+  ],
+  "第二回　21 ～ 40": [
+    ["姐姐畫_圖很美。", ["的"]],
+    ["小鳥飛_好高。", ["得"]],
+    ["這枝筆是哥哥_。", ["的"]],
+    ["弟弟急_滿頭大汗。", ["得"]],
+    ["圓圓_月亮升上來了。", ["的"]],
+    ["同學跑_比我快。", ["得"]],
+    ["媽媽買_水果很新鮮。", ["的"]],
+    ["小花笑_好甜。", ["得"]],
+    ["那是一本有趣_故事書。", ["的"]],
+    ["外面風吹_很冷。", ["得"]],
+    ["爸爸開_車很快，我坐_很穩。", ["的","得"]],
+    ["妹妹唱_很大聲。", ["得"]],
+    ["桌上_蛋糕被吃光了。", ["的"]],
+    ["天氣熱_讓人想喝水。", ["得"]],
+    ["白白_雪花飄下來。", ["的"]],
+    ["哥哥跳_很遠。", ["得"]],
+    ["奶奶說_故事很好聽。", ["的"]],
+    ["小狗叫_好大聲。", ["得"]],
+    ["這是老師送_禮物。", ["的"]],
+    ["他寫_字很工整，也寫_很快。", ["得","得"]]
+  ]
+};
+
+let totalBlanks = 0;
+function render(){
+  const quiz = document.getElementById('quiz');
+  let html = '', n = 0;
+  for (const sec in data){
+    html += `<div class="sectit">${sec}</div><ol${n>0?' start="'+(n+1)+'"':''}>`;
+    data[sec].forEach(item => {
+      n++;
+      const [tpl, ans] = item;
+      let ai = 0, line = '';
+      for (const ch of tpl){
+        if (ch === '_'){
+          const a = ans[ai++];
+          totalBlanks++;
+          line += `<select class="blank" data-ans="${a}"><option value="">？</option><option value="的">的</option><option value="得">得</option></select>`;
+        } else line += ch;
+      }
+      html += `<li>${line}</li>`;
+    });
+    html += '</ol>';
+  }
+  quiz.innerHTML = html;
+  document.querySelector('.score b').nextSibling; // noop
+  document.getElementById('score').parentElement; // noop
+}
+render();
+document.querySelectorAll('.score').forEach(()=>{});
+document.querySelector('.bar .score').innerHTML = '得分：<b id="score">—</b> / ' + totalBlanks;
+
+function check(){
+  const sels = document.querySelectorAll('select.blank');
+  let correct = 0;
+  sels.forEach(s => {
+    s.classList.remove('correct','wrong');
+    if (s.value === s.dataset.ans){ s.classList.add('correct'); correct++; }
+    else s.classList.add('wrong');
+  });
+  document.getElementById('score').textContent = correct;
+  const pct = correct/sels.length;
+  const g = document.getElementById('grade');
+  if (pct === 1) g.textContent = '🎉 全對，太厲害了！';
+  else if (pct >= 0.8) g.textContent = '很棒，再檢查紅色的格子！';
+  else if (pct >= 0.6) g.textContent = '不錯，紅色的再想想～';
+  else g.textContent = '加油，看看下面的口訣再試一次！';
+}
+function reset(){
+  document.querySelectorAll('select.blank').forEach(s => { s.value=''; s.classList.remove('correct','wrong'); });
+  document.getElementById('score').textContent = '—';
+  document.getElementById('grade').textContent = '';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>
